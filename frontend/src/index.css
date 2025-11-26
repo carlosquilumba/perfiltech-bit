@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply box-border;
+  }
+  
+  body {
+    @apply m-0 p-0 font-sans antialiased;
+    @apply bg-gray-50 text-gray-900;
+  }
+  
+  #root {
+    @apply min-h-screen bg-white;
+  }
+}
+
+@layer components {
+  .container-mobile {
+    @apply max-w-md mx-auto px-4;
+  }
+  
+  .container-desktop {
+    @apply max-w-2xl mx-auto px-6;
+  }
+}
+
