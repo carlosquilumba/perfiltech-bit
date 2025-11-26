@@ -28,17 +28,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Azure login with publish profile
-        uses: azure/login@v2
+      - name: Deploy to Azure Functions
+        uses: Azure/functions-action@v1
         with:
+          app-name: bit-profile-prod-func-eastus
+          package: .
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-
-      - name: Install Azure Functions Core Tools
-        run: |
-          npm install -g azure-functions-core-tools@4 --unsafe-perm true
-
-      - name: Publish Azure Function (Flex Consumption)
-        run: |
-          func azure functionapp publish bit-profile-prod-func-eastus --python --force
 
 
