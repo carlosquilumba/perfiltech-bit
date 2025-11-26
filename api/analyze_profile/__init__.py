@@ -6,8 +6,16 @@ from dotenv import load_dotenv
 from openai import AzureOpenAI
 
 
-# Cargar variables desde .env (solo local). Si no existe, no pasa nada.
-load_dotenv()
+# Cargar variables desde archivos .env (solo local). Si no existen, no pasa nada.
+# 1) api/.env
+# 2) api/analyze_profile/.env
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+ENV_PATHS = [
+    os.path.join(BASE_DIR, ".env"),
+    os.path.join(os.path.dirname(__file__), ".env"),
+]
+for env_path in ENV_PATHS:
+    load_dotenv(dotenv_path=env_path, override=False)
 
 # Configuración de Azure OpenAI (lee de variables de entorno).
 AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT")
