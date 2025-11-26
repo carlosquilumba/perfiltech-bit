@@ -46,23 +46,24 @@ Por defecto se abre en `http://localhost:3000`.
 
 ## Cómo levantar la API (Azure Functions Python)
 
-1. Crear/ajustar `api/local.settings.json` (no se sube a git):
+### 1. Configuración local (.env)
 
-```json
-{
-  "IsEncrypted": false,
-  "Values": {
-    "AzureWebJobsStorage": "",
-    "FUNCTIONS_WORKER_RUNTIME": "python",
-    "AZURE_OPENAI_ENDPOINT": "https://bit-profile-prod-openai-eastus.openai.azure.com/",
-    "AZURE_OPENAI_API_KEY": "TU_API_KEY_AQUI",
-    "AZURE_OPENAI_DEPLOYMENT_GPT": "gpt-4.1",
-    "AZURE_OPENAI_API_VERSION": "2025-01-01-preview"
-  }
-}
+Para desarrollo local usamos un archivo `.env` dentro de la carpeta `api` (este archivo **no se sube a git**, está en `.gitignore`).
+
+Crear `api/.env` con este contenido de ejemplo:
+
+```env
+AZURE_OPENAI_ENDPOINT=https://bit-profile-prod-openai-eastus.openai.azure.com/
+AZURE_OPENAI_API_KEY=TU_API_KEY_AQUI
+AZURE_OPENAI_DEPLOYMENT_GPT=gpt-4.1
+AZURE_OPENAI_API_VERSION=2025-01-01-preview
 ```
 
-2. Instalar dependencias y arrancar Functions:
+El código de la Function carga estas variables con `python-dotenv` (`load_dotenv()`).
+
+> Opcional: si prefieres el formato estándar de Azure Functions, también puedes usar `api/local.settings.json`.
+
+### 2. Instalar dependencias y arrancar Functions:
 
 ```bash
 cd api

@@ -2,12 +2,14 @@ import json
 import os
 
 import azure.functions as func
+from dotenv import load_dotenv
 from openai import AzureOpenAI
 
 
+# Cargar variables desde .env (solo local). Si no existe, no pasa nada.
+load_dotenv()
+
 # Configuración de Azure OpenAI (lee de variables de entorno).
-# En local, estas variables vienen de local.settings.json.
-# En Azure, vienen de Application Settings del Function App.
 AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT")
 AZURE_OPENAI_API_KEY = os.environ.get("AZURE_OPENAI_API_KEY")
 AZURE_OPENAI_DEPLOYMENT = os.environ.get("AZURE_OPENAI_DEPLOYMENT_GPT", "gpt-4.1")
