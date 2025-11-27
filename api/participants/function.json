@@ -5,8 +5,8 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": [ "post", "options" ],
-      "route": "analyze_profile"
+      "methods": ["get", "delete", "options"],
+      "route": "participants"
     },
     {
       "type": "http",
@@ -16,3 +16,4 @@
   ],
   "scriptFile": "__init__.py"
 }
+

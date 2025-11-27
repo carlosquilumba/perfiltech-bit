@@ -21,7 +21,8 @@ function ResultPage() {
     if (!cardRef.current || !resultData) return
 
     const canvas = await html2canvas(cardRef.current, {
-      backgroundColor: null,
+      // Fondo blanco sólido para que la tarjeta se vea como en la web
+      backgroundColor: '#ffffff',
       scale: 2,
     })
 
@@ -60,49 +61,55 @@ function ResultPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div
-        ref={cardRef}
-        className="bg-white rounded-lg shadow-card p-6 mb-6 border-l-4 border-bit-green"
-      >
-        {resultData.avatar && (
-          <div className="mb-6 text-center">
-            <img 
-              src={resultData.avatar.url || resultData.avatar} 
-              alt="Avatar" 
-              className="w-40 h-40 mx-auto rounded-lg object-cover border-4 border-bit-green-light"
-            />
-          </div>
-        )}
+      {/* Contenedor de la tarjeta descargable */}
+      <div className="mb-6 flex justify-center">
+        {/* Solo esta parte se captura en la imagen */}
+        <div
+          ref={cardRef}
+          className="bg-white rounded-3xl shadow-card border-4 border-bit-green px-10 py-8 text-center max-w-3xl w-full"
+        >
+          {resultData.avatar && (
+            <div className="mb-6">
+              <img 
+                src={resultData.avatar.url || resultData.avatar} 
+                alt="Avatar" 
+                className="w-40 h-40 mx-auto rounded-lg object-cover border-4 border-bit-green-light"
+              />
+            </div>
+          )}
 
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-1">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">
             {resultData.nombre}
           </h2>
-          <p className="text-lg text-bit-green-dark font-semibold mb-3">
+          <p className="text-xl text-bit-green-dark font-semibold mb-4">
             {resultData.profile.icono} {resultData.profile.nombre}
           </p>
-          <p className="text-gray-700 mb-4">
+          <p className="text-gray-700 mb-5 max-w-2xl mx-auto">
             {resultData.profile.descripcion}
           </p>
+
           {resultData.profile.tecnologias && resultData.profile.tecnologias.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-2 mb-4">
+            <div className="flex flex-wrap justify-center gap-3 mb-6">
               {resultData.profile.tecnologias.map((tech, index) => (
                 <span 
                   key={index}
-                  className="px-3 py-1 bg-bit-green-light/20 text-bit-black rounded-full text-sm"
+                  className="px-4 py-1.5 bg-bit-green-light/20 text-bit-black rounded-full text-sm font-medium"
                 >
                   {tech}
                 </span>
               ))}
             </div>
           )}
-          <div className="border-t border-gray-200 pt-4 mt-4">
-            <p className="text-sm text-gray-600">
+
+          <div className="border-t border-gray-200 pt-4 mt-2">
+            <p className="text-sm text-gray-600 tracking-wide">
               Business IT · 2025
             </p>
           </div>
         </div>
+      </div>
 
+      {/* Botones visibles en la página pero fuera de la captura */}
         <div className="flex gap-3 mb-4">
           <Button 
             onClick={handleDownload}
@@ -110,13 +117,6 @@ function ResultPage() {
             fullWidth
           >
             Guardar
-          </Button>
-          <Button 
-            onClick={handleShare}
-            variant="outline"
-            fullWidth
-          >
-            Compartir
           </Button>
         </div>
 
@@ -128,7 +128,6 @@ function ResultPage() {
           Continuar
         </Button>
       </div>
-    </div>
   )
 }
 

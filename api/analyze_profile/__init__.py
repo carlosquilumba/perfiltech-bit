@@ -36,50 +36,83 @@ def get_client() -> AzureOpenAI | None:
     )
 
 
+def create_response(body: str, status_code: int = 200) -> func.HttpResponse:
+    """Crea una respuesta HTTP con headers CORS."""
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+    }
+    return func.HttpResponse(
+        body,
+        status_code=status_code,
+        mimetype="application/json",
+        headers=headers,
+    )
+
+
 def main(req: func.HttpRequest) -> func.HttpResponse:
+    # Manejar preflight OPTIONS request
+    if req.method == "OPTIONS":
+        return create_response("", 200)
+    
     client = get_client()
     if client is None:
-        return func.HttpResponse(
+        return create_response(
             json.dumps(
                 {
                     "error": "Azure OpenAI no está configurado. Falta AZURE_OPENAI_ENDPOINT o AZURE_OPENAI_API_KEY."
                 }
             ),
             status_code=500,
-            mimetype="application/json",
         )
     try:
         data = req.get_json()
     except ValueError:
-        return func.HttpResponse(
+        return create_response(
             json.dumps({"error": "Body JSON inválido"}),
             status_code=400,
-            mimetype="application/json",
         )
 
     respuestas = data.get("respuestas")
 
     if not isinstance(respuestas, list):
-        return func.HttpResponse(
+        return create_response(
             json.dumps(
                 {
                     "error": "Debes enviar 'respuestas' como lista, por ejemplo: {\"respuestas\": [1,2,3,4,5]}"
                 }
             ),
             status_code=400,
-            mimetype="application/json",
         )
 
-    # Prompt muy simple y directo
+    # Prompt: lista final de perfiles disponibles
     prompt = (
-        "Analiza esta lista de respuestas del test y devuelve un perfil tecnológico.\n\n"
-        f"RESPUESTAS: {respuestas}\n\n"
-        "Devuelve SOLO un JSON válido con esta forma:\n"
+        "Eres un orientador vocacional tecnológico. Debes analizar las respuestas de un test (valores de 1 a 5)\n"
+        "y asignar el perfil tecnológico que mejor encaje entre esta lista de PERFILES DISPONIBLES (pensados para salida de universidad):\n\n"
+        "- BACKEND: Backend Developer – se enfoca en la lógica del servidor, APIs y bases de datos.\n"
+        "- FRONTEND: Frontend Developer – crea interfaces web atractivas y usables con HTML, CSS y JavaScript.\n"
+        "- FULLSTACK: Full Stack Developer – trabaja tanto en frontend como en backend.\n"
+        "- DATA_SCIENTIST: Data Scientist – analiza datos para encontrar patrones e insights.\n"
+        "- DATA_ENGINEER: Data Engineer – construye y mantiene pipelines y sistemas de datos.\n"
+        "- AI_ML: AI / Machine Learning Engineer – diseña, entrena y despliega modelos de IA/ML.\n"
+        "- DEVOPS: DevOps / SRE Developer – automatiza despliegues, monitoreo y confiabilidad.\n"
+        "- AUTOMATION: RPA / Automation Developer – automatiza procesos de negocio con bots.\n"
+        "- QA: QA / Test Automation Engineer – diseña y automatiza pruebas de software.\n"
+        "- UX_UI: UX/UI Designer – diseña experiencias de usuario y prototipos visuales (por ejemplo en Figma).\n\n"
+        "RESPUESTAS DEL TEST (valores 1-4 por pregunta, guardadas como números): "
+        f"{respuestas}\n\n"
+        "Interpreta de forma aproximada así: respuestas relacionadas con diseño/experiencia de usuario favorecen FRONTEND o UX_UI;\n"
+        "respuestas sobre pruebas y asegurar que todo funciona favorecen QA; sobre automatizar tareas de negocio favorecen AUTOMATION;\n"
+        "sobre datos y patrones favorecen DATA_SCIENTIST o DATA_ENGINEER; sobre inteligencia artificial favorecen AI_ML;\n"
+        "sobre lógica, rendimiento y sistemas favorecen BACKEND o DEVOPS; si hay mezcla equilibrada entre frontend y backend favorece FULLSTACK.\n"
+        "Con esto en mente, analiza el patrón general y elige SOLO UN perfil de la lista anterior, el que mejor encaje.\n\n"
+        "Devuelve SOLO un JSON válido con esta forma (sin texto extra):\n"
         "{\n"
-        '  "codigo": "BACKEND",\n'
-        '  "nombre": "Backend Developer",\n'
-        '  "descripcion": "Frase corta (máx 2 líneas) explicando el perfil",\n'
-        '  "tecnologias": ["Tech1", "Tech2", "Tech3"]\n'
+        '  \"codigo\": \"BACKEND | FRONTEND | FULLSTACK | DATA_SCIENTIST | DATA_ENGINEER | AI_ML | DEVOPS | AUTOMATION | QA | UX_UI\",\n'
+        '  \"nombre\": \"Nombre legible del perfil (por ejemplo: Backend Developer)\",\n'
+        '  \"descripcion\": \"Frase corta (máx 2 líneas) explicando el perfil para un estudiante universitario\",\n'
+        '  \"tecnologias\": [\"Tech1\", \"Tech2\", \"Tech3\"]\n'
         "}\n"
     )
 
@@ -98,19 +131,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
     except Exception as e:
         # Error llamando a Azure OpenAI
-        return func.HttpResponse(
+        return create_response(
             json.dumps({"error": f"Error llamando a Azure OpenAI: {str(e)}"}),
             status_code=500,
-            mimetype="application/json",
         )
 
     content = completion.choices[0].message.content.strip()
 
     # Devolvemos lo que diga el modelo tal cual; el frontend espera JSON.
-    return func.HttpResponse(
-        content,
-        status_code=200,
-        mimetype="application/json",
-    )
+    return create_response(content, status_code=200)
 
 

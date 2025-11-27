@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Input from '../components/Input'
-import CameraCapture from '../components/CameraCapture'
 import Button from '../components/Button'
 
 function IdentifyPage() {
@@ -11,7 +10,6 @@ function IdentifyPage() {
     email: '',
     carrera: ''
   })
-  const [photo, setPhoto] = useState(null)
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -27,10 +25,6 @@ function IdentifyPage() {
         [name]: null
       }))
     }
-  }
-
-  const handlePhotoCapture = (base64Photo) => {
-    setPhoto(base64Photo)
   }
 
   const validateForm = () => {
@@ -66,7 +60,6 @@ function IdentifyPage() {
         nombre: formData.nombre,
         email: formData.email,
         carrera: formData.carrera,
-        photo: photo,
         answers: answers
       }
 
@@ -120,28 +113,6 @@ function IdentifyPage() {
             onChange={handleChange}
             placeholder="Ej: Ingeniería en Sistemas"
           />
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-dark mb-2">
-              Foto (opcional)
-            </label>
-            {errors.photo && (
-              <p className="mb-2 text-sm text-red-500">{errors.photo}</p>
-            )}
-            <CameraCapture 
-              onCapture={handlePhotoCapture}
-              onError={(error) => setErrors({ photo: error })}
-            />
-            {photo && (
-              <div className="mt-4">
-                <img 
-                  src={photo} 
-                  alt="Preview" 
-                  className="w-32 h-32 object-cover rounded-lg border-2 border-bit-blue"
-                />
-              </div>
-            )}
-          </div>
 
           {errors.submit && (
             <p className="mb-4 text-sm text-red-500">{errors.submit}</p>

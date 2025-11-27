@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { analyzeProfile, generateAvatar } from '../services/api'
+import { analyzeProfile } from '../services/api'
 
 const LOADING_MESSAGES = [
   'Analizando respuestas...',
@@ -32,19 +32,11 @@ function LoadingPage() {
         const profileResult = await analyzeProfile(participantData.answers)
         await new Promise(resolve => setTimeout(resolve, 1500))
 
-        let avatarResult = null
-        if (participantData.photo) {
-          setCurrentMessage(2)
-          avatarResult = await generateAvatar(participantData.photo, profileResult)
-          await new Promise(resolve => setTimeout(resolve, 1000))
-        }
-
         setCurrentMessage(3)
         
         const resultData = {
           ...participantData,
-          profile: profileResult,
-          avatar: avatarResult
+          profile: profileResult
         }
         
         localStorage.setItem('resultData', JSON.stringify(resultData))

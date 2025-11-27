@@ -9,7 +9,7 @@ const QUESTIONS = [
     question: 'Cuando tienes un problema, ¿qué haces?',
     options: [
       { id: 1, text: 'Investigar a fondo' },
-      { id: 2, text: 'Probar soluciones' },
+      { id: 2, text: 'Probar y testear soluciones hasta que todo funcione bien' },
       { id: 3, text: 'Hacer un plan' },
       { id: 4, text: 'Preguntar a otros' }
     ]

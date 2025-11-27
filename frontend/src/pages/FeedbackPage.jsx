@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
-import { saveFeedback } from '../services/api'
+import { saveParticipant } from '../services/api'
 
 const RATINGS = [
   { value: 1, emoji: '😢' },
@@ -32,16 +32,35 @@ function FeedbackPage() {
 
     try {
       const resultData = JSON.parse(localStorage.getItem('resultData') || '{}')
-      
-      await saveFeedback({
-        participant_id: resultData.id || Date.now().toString(),
+
+      // Construir payload para guardar participante completo en Cosmos DB
+      const payload = {
+        evento: 'ESPOCH_2025',
+        nombre: resultData.nombre,
+        email: resultData.email,
+        carrera: resultData.carrera,
+        respuestas: resultData.answers,
+        perfil: {
+          codigo: resultData.profile?.codigo,
+          nombre: resultData.profile?.nombre,
+          descripcion: resultData.profile?.descripcion,
+          tecnologias: resultData.profile?.tecnologias,
+        },
         rating: selectedRating,
-        comentario: comment
-      })
+        comentario: comment,
+        avatar_url: resultData.avatar?.url || resultData.avatar || '',
+        origen: 'web',
+      }
+
+      try {
+        await saveParticipant(payload)
+      } catch (err) {
+        console.error('Error guardando participante (se continúa igual):', err)
+      }
 
       navigate('/thanks')
     } catch (error) {
-      console.error('Error guardando feedback:', error)
+      console.error('Error en envío de feedback:', error)
       navigate('/thanks')
     } finally {
       setIsSubmitting(false)
